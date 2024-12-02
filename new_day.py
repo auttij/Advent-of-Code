@@ -1,68 +1,98 @@
-import sys, os, shutil
+import sys, os, shutil, argparse
 from aocd import get_data
+from datetime import datetime
+from pathlib import Path
+
+
+def get_arg_parser():
+    now = datetime.now()
+    current_day = now.day
+    current_year = now.year
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-year",
+        type=int,
+        default=current_year,
+        choices=range(2015, current_year + 1),
+        help="Year of selected aoc problem",
+    )
+    parser.add_argument(
+        "-day",
+        type=int,
+        default=current_day,
+        choices=range(1, 26),
+        help="Day of selected aoc problem",
+    )
+    parser.add_argument(
+        "--full-year",
+        action=argparse.BooleanOptionalAction,
+        help="Setup all the days in a year at once",
+    )
+    return parser
 
 
 class newDayCreator:
-    def __init__(self, year, day, force=False):
+    def __init__(self, year, day):
         self.year = year
         self.day = day
-        self.force = force
 
-    def create(self):
-        print("Starting new day folder generation")
-        if self.force:
-            self.empty_dir()
-        self.copy_template()
-        self.create_inputs()
+        template_dir = "template"
+        self.template_file_name = os.listdir(template_dir)[0]
+        self.template_path = f"{template_dir}/{self.template_file_name}"
 
-    def write_input_file(self, filename, data):
-        file_path = f"{self.day/filename}"
-        print(f"printing {len(data)} lines of data to {file_path}")
+    def create_year(self):
+        for i in range(1, 26):
+            success = self.create_day(self.year, i)
+            if not success:
+                print(f"couldn't download inputs for {self.year}-{i}")
+                print("Stopping...")
+                return 1
+
+    def create_day(self, year=None, day=None):
+        if year == None:
+            year = self.year
+        if day == None:
+            day = self.day
+
+        folder = f"{year}/{day}"
+
+        if not os.path.exists(folder):
+            print(f"Creating folder {folder}")
+            Path(folder).mkdir(parents=True, exist_ok=True)
+
+        target_filename = f"{folder}/{self.template_file_name}"
+        if not os.path.exists(target_filename):
+            print(f"Copying template file")
+            shutil.copy(self.template_path, target_filename)
+
+        return self.create_inputs(folder, year, day)
+
+    def create_inputs(self, folder, year, day):
+        self.write_input_file(f"{folder}/input1.txt", "")
+        try:
+            data = get_data(day=day, year=year)
+            self.write_input_file(f"{folder}/input2.txt", data)
+            return True
+        except:
+            return False
+
+    def write_input_file(self, file_path, data):
+        print("Writing input file:", file_path)
+        if data:
+            print("Peek at data:\n", data[:30], "\n")
         with open(file_path, "w") as f:
-            for line in data:
-                f.write(line)
-
-    def empty_dir(self):
-        print(f"Emptying and deleting directory {self.day}")
-        if self.force:
-            folder = f"{self.day}"
-            for filename in os.listdir(folder):
-                file_path = os.path.join(folder, filename)
-                try:
-                    if os.path.isfile(file_path) or os.path.islink(file_path):
-                        os.unlink(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print("Failed to delete %s. Reason: %s" % (file_path, e))
-            os.rmdir(folder)
-
-    def copy_template(self):
-        if not os.path.exists(self.day):
-            print(f"Creating folder /{self.day}")
-            os.mkdir(self.day)
-        print(f"Copying /template/day.py to {self.year}/{self.day}/day.py")
-        shutil.copy("template/day.py", f"{self.year}/{self.day}/day.py")
-
-    def create_inputs(self):
-        with open(f"{self.year}/{self.day}/input1.txt", "w") as f:
-            pass
-        with open(f"{self.year}/{self.day}/input2.txt", "w") as f:
-            data = get_data(day=int(self.day), year=self.year)
             f.write(data)
 
 
-if __name__ == "__main__":
-    if not len(sys.argv) > 2:
-        print("Argument for year and day required")
+def main(args):
+    parser = get_arg_parser()
+    pargs = parser.parse_args(args)
+    ndc = newDayCreator(pargs.year, pargs.day)
+    if pargs.full_year:
+        ndc.create_year()
     else:
-        year = sys.argv[1]
-        day = sys.argv[2]
-        force = False
-        if "--force" in sys.argv or "-f" in sys.argv:
-            force = True
-        if not os.path.exists(os.path.join(year, day)) or force:
-            ndc = newDayCreator(day, force)
-            ndc.create()
-        else:
-            print(f"Path for {year}/{day} already exists")
+        ndc.create_day()
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
