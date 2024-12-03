@@ -11,7 +11,7 @@ def parse(arr):
     do = re.compile("do\\(\\)")
     dont = re.compile("don't\\(\\)")
 
-    matches = [(m.groups(), m.span()[0]) for m in r.finditer(arr)]
+    matches = [(tuple(map(int, m.groups())), m.span()[0]) for m in r.finditer(arr)]
     dos = [("do", m.span()[0]) for m in do.finditer(arr)]
     donts = [("dont", m.span()[0]) for m in dont.finditer(arr)]
 
@@ -27,7 +27,7 @@ def part1(arr):
     for ins in arr:
         if isinstance(ins, tuple):
             x, y = ins
-            s += int(x) * int(y)
+            s += x * y
     return s
 
 
@@ -43,7 +43,7 @@ def part2(arr):
             enabled = False
         elif enabled:
             x, y = ins
-            s += int(x) * int(y)
+            s += x * y
     return s
 
 
