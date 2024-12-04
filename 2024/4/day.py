@@ -36,9 +36,7 @@ def part1(arr):
 def search2(arr, pos):
     def to_pos(coord):
         ys, xs = coord
-        if 0 <= ys < len(arr) and 0 <= xs < len(arr[0]):
-            return arr[ys][xs]
-        return "."
+        return arr[ys][xs]
 
     y, x = pos
     vals1 = "".join(map(to_pos, [(y - 1, x - 1), (y + 1, x + 1)]))
@@ -50,8 +48,14 @@ def search2(arr, pos):
 @print_result
 def part2(arr):
     found = 0
-    for y, row in enumerate(arr):
-        found += sum([search2(arr, (y, x)) for x, val in enumerate(row) if val == "A"])
+    for y, row in enumerate(arr[1:-1], start=1):
+        found += sum(
+            [
+                search2(arr, (y, x))
+                for x, val in enumerate(row[1:-1], start=1)
+                if val == "A"
+            ]
+        )
     return found
 
 
