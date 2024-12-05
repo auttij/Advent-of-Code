@@ -31,6 +31,7 @@ def is_ordered(rules, row):
             yi = row.index(y)
             if yi < xi:
                 ordered = False
+                break
     return ordered
 
 
