@@ -44,9 +44,7 @@ def re_order(rules, row):
                 xi = row.index(x)
                 yi = row.index(y)
                 if yi < xi:
-                    temp = row[xi]
-                    row[xi] = y
-                    row[yi] = temp
+                    row[xi], row[yi] = row[yi], row[xi]
         ordered = is_ordered(rules, row)
     return row
 
