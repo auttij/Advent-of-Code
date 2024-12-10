@@ -6,30 +6,11 @@ from aocHelpers.init import init
 from aocHelpers.helpers import bfs
 
 
-def dfs(grid, start, end, cmp):
-    stack = []
-    stack.push(start)
-    seen = set()
-    while stack:
-        pos = stack.pop(-1)
-        if pos == end:
-            return stack
-        if pos in seen:
-            continue
-        seen.add(pos)
-        y, x = pos
-        for dy, dx in ((0, 1), (1, 0), (0, -1), (-1, 0)):
-            if (
-                0 <= x + dx < len(grid)
-                and 0 <= y + dy < len(grid[0])
-                and cmp(grid[y + dy][x + dx], grid[y][x])
-            ):
-                stack.append((y + dy, x + dx))
+def cmp(nex, cur):
+    return int(nex) - int(cur) == 1
 
 
-@timer
-@print_result
-def part1(arr):
+def find_starts_ends(arr):
     zeroes = []
     nines = []
     for y, row in enumerate(arr):
@@ -38,31 +19,23 @@ def part1(arr):
                 zeroes.append((y, x))
             if val == "9":
                 nines.append((y, x))
+    return zeroes, nines
 
-    def cmp(nex, cur):
-        if not (nex.isdigit() and cur.isdigit()):
-            return False
-        if int(nex) - int(cur) == 1:
-            # print(nex, cur)
-            return True
-        return False
 
+@timer
+@print_result
+def part1(arr):
+    starts, ends = find_starts_ends(arr)
     can_reach = 0
-    for start in zeroes:
-        score = 0
-        for nine_pos in nines:
-            if bfs(arr, start, nine_pos, cmp) < 200:
-                # print(start, nine_pos)
-                score += 1
-        # print(start, score)
-        can_reach += score
+    for start in starts:
+        can_reach += sum((bfs(arr, start, end, cmp) < 10 for end in ends))
     return can_reach
-    pass
 
 
 from collections import deque
 
 
+# custom bfs without seen check, that counts amount of paths to each 9 dist
 def bfs2(grid, start, end, cmp):
     out = 0
     q = deque()
@@ -87,30 +60,8 @@ def bfs2(grid, start, end, cmp):
 @timer
 @print_result
 def part2(arr):
-    zeroes = []
-    nines = []
-    for y, row in enumerate(arr):
-        for x, val in enumerate(row):
-            if val == "0":
-                zeroes.append((y, x))
-            if val == "9":
-                nines.append((y, x))
-
-    def cmp(nex, cur):
-        if not (nex.isdigit() and cur.isdigit()):
-            return False
-        if int(nex) - int(cur) == 1:
-            # print(nex, cur)
-            return True
-        return False
-
-    can_reach = 0
-    for start in zeroes:
-        score = bfs2(arr, start, (0, 0), cmp)
-        # print(start, score)
-        can_reach += score
-    return can_reach
-    pass
+    starts, _ = find_starts_ends(arr)
+    return sum((bfs2(arr, start, "", cmp) for start in starts))
 
 
 def main(args=None):
