@@ -34,7 +34,7 @@ def pp(pos, w, h):
     rows = [["." for i in range(w)] for j in range(h)]
     for y in range(h):
         for x in range(w):
-            if (y, x) in pos:
+            if (x, y) in pos:
                 rows[y][x] = "#"
     for line in rows:
         print("".join(line))
