@@ -6,9 +6,12 @@ from aocHelpers.init import init
 from aocHelpers.helpers import bfs
 
 
-def get_grid():
-    h, w = 71, 71
-    return (0, 0), (70, 70), [["." for x in range(w)] for y in range(h)]
+def get_grid(size):
+    return (
+        (0, 0),
+        (size, size),
+        [["." for x in range(size + 1)] for y in range(size + 1)],
+    )
 
 
 def process_bytes(grid, bytes):
@@ -24,38 +27,35 @@ def cmp(nex, prev):
 @timer
 @print_result
 def part1(arr):
-    start, end, grid = get_grid()
+    start, end, grid = get_grid(70)
     grid = process_bytes(grid, arr[:1024])
     return bfs(grid, start, end, cmp)
-
-
-def can_pass(steps):
-    return steps != float("inf")
 
 
 @timer
 @print_result
 def part2(arr):
-    start, end, grid = get_grid()
+    def can_pass(grid):
+        return bfs(grid, start, end, cmp) != float("inf")
+
+    start, end, grid = get_grid(70)
     grid = process_bytes(grid, arr[:1024])
     i = 1024
 
-    # check every 100 steps until can't pass
+    # check every x steps until can't pass
+    x = 200
     passable = True
     while passable:
-        new_grid = [row[:] for row in grid]
-        for j in range(100):
-            nx, ny = arr[i + j]
-            new_grid[ny][nx] = "#"
-        passable = can_pass(bfs(new_grid, start, end, cmp))
+        new_grid = process_bytes([row[:] for row in grid], arr[i : i + x])
+        passable = can_pass(new_grid)
         if passable:
             grid = new_grid
-            i += 100
+            i += x
 
     # check every step
     for x, y in arr[i:]:
         grid[y][x] = "#"
-        if not can_pass(bfs(grid, start, end, cmp)):
+        if not can_pass(grid):
             return f"{str(x)},{str(y)}"
 
 
