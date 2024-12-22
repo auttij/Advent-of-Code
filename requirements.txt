@@ -1,2 +1,3 @@
 advent-of-code-data
 z3-solver
+matplotlib
