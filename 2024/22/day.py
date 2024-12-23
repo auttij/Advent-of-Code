@@ -9,9 +9,9 @@ MOD = 16777216
 
 def calculate(secret, iterations=1):
     for _ in range(iterations):
-        mixed = (secret ^ (secret * 64)) % MOD
-        div = ((mixed // 32) ^ mixed) % MOD
-        secret = ((div * 2048) ^ div) % MOD
+        secret = (secret ^ (secret << 6)) % MOD
+        secret = (secret >> 5) ^ secret
+        secret = ((secret << 11) ^ secret) % MOD
     return secret
 
 
@@ -23,14 +23,15 @@ def part1(arr):
 
 def first_sequence_values(secret):
     seqs = {}
-    last = ()
+    seq = 0
     prev = secret % 10
+    lim = 32767  # 2^15 - 1
 
     for _ in range(2000):
         secret = calculate(secret)
         val = secret % 10
-        last = (*last[-3:], val - prev)
-        seqs.setdefault(last, val)
+        seq = ((lim & seq) << 5) + (val - prev + 9)
+        seqs.setdefault(seq, val)
         prev = val
     return seqs
 
@@ -41,7 +42,7 @@ def calculate_best_sequence(arr):
         seqs = first_sequence_values(secret)
         for k, v in seqs.items():
             totals[k] = totals.get(k, 0) + v
-    return max(totals.items(), key=lambda item: item[1])
+    return max(totals.items(), key=lambda item: item[1])[1]
 
 
 @timer
