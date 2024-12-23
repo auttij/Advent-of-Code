@@ -55,10 +55,34 @@ def find_largest_clique():
     return largest_clique
 
 
+def find_largest_clique_fast():
+    candidates = [node for node in neighbors.keys() if node[0] == "t"]
+    largest_clique = ()
+
+    seen = set()
+
+    for node in candidates:
+        if node in seen:
+            continue
+
+        n_a = neighbors[node]
+        sub = len(n_a)
+
+        while sub >= len(largest_clique):
+            for combo in combinations(n_a, sub):
+                clique = (node,) + combo
+                if is_clique(clique) and len(clique) > len(largest_clique):
+                    largest_clique = clique
+                    seen.update(clique)
+                    break
+            sub -= 1
+    return largest_clique
+
+
 @timer
 @print_result
 def part2():
-    return ",".join(sorted(find_largest_clique()))
+    return ",".join(sorted(find_largest_clique_fast()))
 
 
 def main(args=None):
