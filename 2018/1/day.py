@@ -1,0 +1,56 @@
+from sys import argv
+from os import path
+from aocHelpers.decorators import aoc_part
+from aocHelpers.init import init
+
+
+@aoc_part
+def part1(arr):
+    freq = 0
+    for i in arr:
+        freq += i
+    return freq
+
+
+@aoc_part
+def part2(arr):
+    out = {}
+
+    freq = 0
+    while True:
+        for i, val in enumerate(arr):
+            freq += val
+            if freq in out:
+                return freq
+            out[freq] = i
+
+
+def parse_input(raw):
+    # arr
+    # return raw.splitlines()
+
+    # int arr
+    return list(map(int, raw.splitlines()))
+
+    # str pairs
+    # return [line.split() for line in raw.splitlines()]
+
+    # select numbers from input
+    # import re
+    # return [tuple(map(int, re.findall(r"-?\d+", line))) for line in raw.splitlines()]
+
+    return raw
+
+
+def main(args=None):
+    raw = init(path.dirname(__file__), args)
+
+    data1 = parse_input(raw)
+    part1(data1)
+
+    data2 = parse_input(raw)
+    part2(data2)
+
+
+if __name__ == "__main__":
+    main(argv[1:])
