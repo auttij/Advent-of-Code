@@ -1,6 +1,5 @@
 from sys import argv
 from os import path
-from aocHelpers import inputs
 from aocHelpers.decorators import timer, print_result
 from aocHelpers.init import init
 
@@ -17,10 +16,31 @@ def part2(arr):
     pass
 
 
+def parse_input(raw):
+    # arr
+    # return raw.splitlines()
+
+    # int arr
+    # return list(map(int, raw.splitlines()))
+
+    # str pairs
+    # return [line.split() for line in raw.splitlines()]
+
+    # select numbers from input
+    # import re
+    # return [tuple(map(int, re.findall(r"-?\d+", line))) for line in raw.splitlines()]
+
+    return raw
+
+
 def main(args=None):
-    arr = init(path.dirname(__file__), inputs.read_to_str_arr, args)
-    part1(arr.copy())
-    part2(arr.copy())
+    raw = init(path.dirname(__file__), args)
+
+    data1 = parse_input(raw)
+    part1(data1)
+
+    data2 = parse_input(raw)
+    part2(data2)
 
 
 if __name__ == "__main__":
