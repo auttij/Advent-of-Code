@@ -1,17 +1,15 @@
 from sys import argv
 from os import path
-from aocHelpers.decorators import timer, print_result
+from aocHelpers.decorators import aoc_part
 from aocHelpers.init import init
 
 
-@timer
-@print_result
+@aoc_part
 def part1(arr):
     pass
 
 
-@timer
-@print_result
+@aoc_part
 def part2(arr):
     pass
 
