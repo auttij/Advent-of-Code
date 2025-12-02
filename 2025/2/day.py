@@ -34,9 +34,7 @@ def part2(arr):
 
 
 def parse_input(raw):
-    return [
-        pair.split("-") for pair in [line.split(",") for line in raw.splitlines()][0]
-    ]
+    return [pair.split("-") for pair in raw.split(",")]
 
 
 def main(args=None):
