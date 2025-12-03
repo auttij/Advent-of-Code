@@ -22,6 +22,7 @@ def get_arg_parser():
         choices=range(1, 26),
         help="Day of selected AoC problem",
     )
+    parser.add_argument("-block", action=argparse.BooleanOptionalAction)
     parser.add_argument(
         "--full-year",
         action=argparse.BooleanOptionalAction,
@@ -31,9 +32,16 @@ def get_arg_parser():
 
 
 class NewDayCreator:
-    def __init__(self, year: int, day: int, template_dir: str = "template"):
+    def __init__(
+        self,
+        year: int,
+        day: int,
+        block: bool = False,
+        template_dir: str = "template",
+    ):
         self.year = year
         self.day = day
+        self.block = block
         self.template_dir = Path(template_dir)
 
         if not self.template_dir.exists():
@@ -51,9 +59,10 @@ class NewDayCreator:
                 return False
         return True
 
-    def create_day(self, year=None, day=None):
+    def create_day(self, year=None, day=None, block=False):
         year = year or self.year
         day = day or self.day
+        block = block or self.block
 
         day_folder = (
             Path(year / day) if isinstance(year, Path) else Path(f"{year}/{day}")
@@ -66,7 +75,7 @@ class NewDayCreator:
         self.copy_template(day_folder)
 
         # Create input files
-        return self.create_inputs(day_folder, year, day)
+        return self.create_inputs(day_folder, year, day, block)
 
     def copy_template(self, target_folder: Path):
         print("📄 Copying template files...")
@@ -81,7 +90,7 @@ class NewDayCreator:
                 # Copy individual files
                 shutil.copy2(item, target)
 
-    def create_inputs(self, folder: Path, year: int, day: int):
+    def create_inputs(self, folder: Path, year: int, day: int, block: bool = False):
         # empty input1
         input1 = folder / "input1.txt"
         print(f"📝 Creating empty {input1}")
@@ -92,7 +101,7 @@ class NewDayCreator:
         print(f"🌐 Downloading input for {year}-{day}...")
 
         try:
-            data = get_data(year=year, day=day)
+            data = get_data(year=year, day=day, block=block)
             input2.write_text(data)
             print("   ✔ Download OK")
             return True
@@ -105,7 +114,7 @@ def main(args):
     parser = get_arg_parser()
     p = parser.parse_args(args)
 
-    creator = NewDayCreator(p.year, p.day)
+    creator = NewDayCreator(p.year, p.day, p.block)
 
     if p.full_year:
         creator.create_year()
