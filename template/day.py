@@ -5,12 +5,12 @@ from aocHelpers.init import init
 
 
 @aoc_part
-def part1(arr):
+def part1(data):
     pass
 
 
 @aoc_part
-def part2(arr):
+def part2(data):
     pass
 
 
