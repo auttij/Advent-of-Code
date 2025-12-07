@@ -6,10 +6,10 @@ from aocHelpers.init import init
 
 def track_beams(data):
     splits = 0
-    beams = [0] * len(data)
+    beams = [0] * len(data[0])
     beams[data[0].index("S")] = 1
 
-    for line in data[::2]:
+    for line in data[2::2]:
         new_beams = [0] * len(line)
         for i, ch in enumerate(line):
             if ch == "^":
