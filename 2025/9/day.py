@@ -18,16 +18,13 @@ def part1(data):
 @aoc_part
 def part2(data):
     pairs = sorted(combinations(data, 2), key=get_area, reverse=True)
-    for a, b in pairs:
-        x1, y1 = a
-        x2, y2 = b
-
+    for (x1, y1), (x2, y2) in pairs:
         # bounds of square
         bx1, bx2 = min(x1, x2), max(x1, x2)
         by1, by2 = min(y1, y2), max(y1, y2)
 
         # check if any line intersects with our square
-        for (lx1, ly1), (lx2, ly2) in pairwise(data):
+        for (lx1, ly1), (lx2, ly2) in pairwise(data + [data[0]]):
             if not (
                 max(lx1, lx2) <= bx1
                 or bx2 <= min(lx1, lx2)
@@ -36,7 +33,7 @@ def part2(data):
             ):
                 break
         else:
-            return get_area((a, b))
+            return get_area(((x1, y1), (x2, y2)))
 
 
 def parse_input(raw):
