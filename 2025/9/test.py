@@ -10,13 +10,13 @@ def read_data(filename):
 input1 = parse_input(read_data("input1.txt"))
 
 cases = [
-    TestCase("part 1 example", input1, 12),
+    TestCase("part 1 example", input1, 50),
 ]
 
 run_tests(part1, cases)
 
 cases = [
-    TestCase("part 2 example", input1, 0),
+    TestCase("part 2 example", input1, 24),
 ]
 
 run_tests(part2, cases)
